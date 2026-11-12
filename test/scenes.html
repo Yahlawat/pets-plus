@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!-- Gallery of every theme, day and night, at sidebar size, with effects running.
+     Serve the repo root and open /test/scenes.html (?size=small, ?w=300&h=170). -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pets+ scenes</title>
+<style>
+  body { margin: 8px; font: 11px sans-serif; background: #ddd; }
+  .grid { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 10px; }
+  .box { position: relative; overflow: hidden; background-repeat: repeat-x; background-position: bottom left; }
+  .box canvas { position: absolute; left: 0; bottom: 0; image-rendering: pixelated; }
+  .label { font-weight: 600; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+<script src="../media/scenes.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const size = q.get('size') || 'small', W = +(q.get('w') || 300), H = +(q.get('h') || 170);
+  const themes = (q.get('themes') || 'lakefront,city,space,dojo,mountains,room,blossom,forest,castle,beach,winter,autumn').split(',');
+  const grid = document.getElementById('grid');
+  const live = [];
+  for (const theme of themes) {
+    for (const kind of ['light', 'dark']) {
+      const cell = document.createElement('div');
+      cell.innerHTML = `<div class="label">${theme} · ${kind === 'light' ? 'day' : 'night'}</div>`;
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.style.width = `${W}px`; box.style.height = `${H}px`;
+      const canvases = [0, 1, 2].map(() => box.appendChild(document.createElement('canvas')));
+      const fx = PetsScenes.build(theme, { width: W, height: H, size, kind, effects: true }, canvases);
+      // A pet-height marker on the floor, to check the ground line.
+      const floor = PetsScenes.has(theme) ? PetsScenes.floor(size) : null;
+      if (floor != null) {
+        const m = document.createElement('div');
+        m.style.cssText = `position:absolute;left:${W / 2 - 10}px;bottom:${floor}px;width:20px;height:20px;background:rgba(255,0,0,.5)`;
+        box.appendChild(m);
+      }
+      if (fx) { for (let i = 0; i < 90; i++) fx.step(1 / 30); fx.draw(); live.push(fx); }
+      cell.appendChild(box);
+      grid.appendChild(cell);
+    }
+  }
+  let last = performance.now();
+  (function frame() {
+    const t = performance.now(), dt = Math.min(0.1, (t - last) / 1000); last = t;
+    for (const fx of live) { fx.step(dt); fx.draw(); }
+    requestAnimationFrame(frame);
+  })();
+</script>
+</body>
+</html>

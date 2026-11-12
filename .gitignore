@@ -1,0 +1,8 @@
+.DS_Store
+.vscode-test/
+_to_delete/
+dist/
+node_modules/
+.env
+.env.*
+*.vscdb*

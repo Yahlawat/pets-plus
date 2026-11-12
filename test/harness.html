@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- Browser harness for media/panel.js: fakes the VS Code webview API and the
+     extension's messages, so the panel can be tried in a normal browser.
+     Serve the repo root (python3 -m http.server) and open /test/harness.html. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pets+ harness</title>
+<link rel="stylesheet" href="../media/panel.css">
+<style>
+  #controls { position: fixed; top: 0; right: 0; z-index: 99; display: flex; flex-wrap: wrap; gap: 3px; max-width: 220px; font: 11px sans-serif; }
+  #controls[hidden] { display: none; }
+  #controls button { font-size: 10px; }
+  #log { position: fixed; bottom: 0; right: 0; z-index: 99; font: 10px monospace; background: #fff8; max-width: 220px; }
+</style>
+</head>
+<body class="vscode-dark" style="--vscode-sideBar-background:#1e1e1e;--vscode-foreground:#ccc">
+<div id="controls"></div>
+<div id="log"></div>
+<script>
+  const sent = [];
+  let st = null;
+  window.acquireVsCodeApi = () => ({
+    postMessage: m => { sent.push(m); document.getElementById('log').textContent = JSON.stringify(m); onPanel(m); },
+    getState: () => st,
+    setState: s => { st = s; },
+  });
+  const pet = (id, type, color, name, extra = {}) => ({
+    id, type, color, name, born: Date.now() - 12 * 864e5, xp: 130, mood: 80, food: 60, petted: 3, fed: 1,
+    unlocked: [color], level: 2, into: 70, need: 120, ageDays: 12, face: '😊', hungry: false, ...extra,
+  });
+  // Synthetic pets for the browser harness.
+  let pets = [
+    pet('a', 'bunny', 'purple', 'Demo Bunny'),
+    pet('b', 'cat', 'gray', 'Demo Cat', { unlocked: ['gray', 'white'] }),
+    pet('c', 'dog', 'white', 'Demo Dog'),
+    pet('d', 'frog', 'blue', 'Demo Frog', { mood: 20, face: '😢', food: 20, hungry: true }),
+    pet('e', 'squirrel', 'brown', 'Demo Squirrel'),
+  ];
+  // ?extra=dog,squirrel,frog adds more pets (first colour of each type).
+  const extraTypes = (new URLSearchParams(location.search).get('extra') || '').split(',').filter(Boolean);
+  const colourOf = { dog: 'brown', squirrel: 'brown', frog: 'green', bunny: 'white', crab: 'red', snail: 'brown',
+    'rubber-duck': 'yellow', chicken: 'white', snake: 'green', rat: 'gray', horse: 'brown', clippy: 'yellow', panda: 'black' };
+  extraTypes.forEach((t, i) => pets.push(pet('x' + i, t, colourOf[t] || 'brown', t[0].toUpperCase() + t.slice(1))));
+  const send = m => window.postMessage(m, '*');
+  function onPanel(m) {
+    if (m.type === 'ready') {
+      fetch('../media/pets/manifest.json').then(r => r.json()).then(manifest => send({
+        type: 'init', size: new URLSearchParams(location.search).get('size') || 'small',
+        theme: new URLSearchParams(location.search).get('theme') || 'forest', effects: true,
+        media: '../media', manifest, focus: false, pets, global: { streak: 4, minutesToday: 37 },
+      }));
+    }
+    if (m.type === 'colour' || m.type === 'rename') {
+      pets = pets.map(p => p.id === m.id ? { ...p, ...(m.type === 'colour' ? { color: m.color } : { name: m.name }) } : p);
+      send({ type: 'pets', pets });
+    }
+    if (m.type === 'feed') send({ type: 'event', kind: 'feed', results: [{ id: m.id, ate: true }] });
+  }
+  const events = ['save', 'commit', 'testsPass', 'testsFail', 'errorsUp', 'errorsCleared', 'typingFast', 'sleep', 'wake',
+    'focusStart', 'breakStart', 'breakEnd', 'ball'];
+  if (new URLSearchParams(location.search).has('preview')) {
+    document.getElementById('controls').hidden = true;
+    document.getElementById('log').hidden = true;
+  }
+  const c = document.getElementById('controls');
+  for (const k of events) {
+    const b = document.createElement('button'); b.textContent = k;
+    b.onclick = () => send({ type: 'event', kind: k }); c.appendChild(b);
+  }
+  const extra = { 'levelUp': () => send({ type: 'event', kind: 'levelUp', id: 'c', level: 3 }),
+    'feedAll': () => send({ type: 'event', kind: 'feed', results: pets.map(p => ({ id: p.id, ate: p.id !== 'a' })) }),
+    'card': () => send({ type: 'openCard', id: 'b' }), 'light': () => { document.body.className = document.body.className === 'vscode-dark' ? 'vscode-light' : 'vscode-dark'; } };
+  for (const [k, fn] of Object.entries(extra)) { const b = document.createElement('button'); b.textContent = k; b.onclick = fn; c.appendChild(b); }
+</script>
+<script>window.__PETS_TEST__ = true;</script>
+<script src="../media/scenes.js"></script>
+<script src="../media/species.js"></script>
+<script src="../media/panel.js"></script>
+</body>
+</html>

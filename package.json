@@ -1,0 +1,265 @@
+{
+  "name": "pets-plus",
+  "displayName": "Pets+",
+  "description": "Pets in your Explorer that react to your coding, get hungry, level up and keep you company through focus blocks.",
+  "version": "0.4.0",
+  "publisher": "yashahlawat",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "petsPlus.view",
+          "name": "Pets+"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "petsPlus.spawn",
+        "title": "Pets+: Spawn Pet",
+        "icon": "$(add)"
+      },
+      {
+        "command": "petsPlus.feed",
+        "title": "Pets+: Feed Pets",
+        "icon": "$(heart)"
+      },
+      {
+        "command": "petsPlus.ball",
+        "title": "Pets+: Throw Ball",
+        "icon": "$(circle-filled)"
+      },
+      {
+        "command": "petsPlus.focus",
+        "title": "Pets+: Focus Timer",
+        "icon": "$(watch)"
+      },
+      {
+        "command": "petsPlus.stats",
+        "title": "Pets+: Show Pet Stats"
+      },
+      {
+        "command": "petsPlus.rename",
+        "title": "Pets+: Rename Pet"
+      },
+      {
+        "command": "petsPlus.remove",
+        "title": "Pets+: Remove Pet"
+      },
+      {
+        "command": "petsPlus.restore",
+        "title": "Pets+: Bring Back a Pet"
+      },
+      {
+        "command": "petsPlus.theme",
+        "title": "Pets+: Change Theme"
+      },
+      {
+        "command": "petsPlus.importOld",
+        "title": "Pets+: Import from VS Code Pets"
+      },
+      {
+        "command": "petsPlus.toggleStatusBar",
+        "title": "Pets+: Toggle Status Bar Pet"
+      },
+      {
+        "command": "petsPlus.show",
+        "title": "Pets+: Show Pets"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "petsPlus.spawn",
+          "when": "view == petsPlus.view",
+          "group": "navigation@1"
+        },
+        {
+          "command": "petsPlus.feed",
+          "when": "view == petsPlus.view",
+          "group": "navigation@2"
+        },
+        {
+          "command": "petsPlus.ball",
+          "when": "view == petsPlus.view",
+          "group": "navigation@3"
+        },
+        {
+          "command": "petsPlus.focus",
+          "when": "view == petsPlus.view",
+          "group": "navigation@4"
+        },
+        {
+          "command": "petsPlus.stats",
+          "when": "view == petsPlus.view",
+          "group": "more@1"
+        },
+        {
+          "command": "petsPlus.rename",
+          "when": "view == petsPlus.view",
+          "group": "more@2"
+        },
+        {
+          "command": "petsPlus.theme",
+          "when": "view == petsPlus.view",
+          "group": "more@3"
+        },
+        {
+          "command": "petsPlus.remove",
+          "when": "view == petsPlus.view",
+          "group": "more@4"
+        },
+        {
+          "command": "petsPlus.restore",
+          "when": "view == petsPlus.view",
+          "group": "more@5"
+        },
+        {
+          "command": "petsPlus.toggleStatusBar",
+          "when": "view == petsPlus.view",
+          "group": "more@6"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "petsPlus.show",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Pets+",
+      "properties": {
+        "petsPlus.size": {
+          "type": "string",
+          "enum": [
+            "nano",
+            "small",
+            "medium",
+            "large"
+          ],
+          "default": "nano",
+          "description": "Pet size."
+        },
+        "petsPlus.theme": {
+          "type": "string",
+          "enum": [
+            "none",
+            "forest",
+            "castle",
+            "beach",
+            "winter",
+            "autumn",
+            "lakefront",
+            "city",
+            "space",
+            "dojo",
+            "mountains",
+            "room",
+            "blossom"
+          ],
+          "enumDescriptions": [
+            "",
+            "Pixel forest",
+            "Gothic castle",
+            "Beach",
+            "Snowy winter",
+            "Autumn leaves",
+            "Evanston lakefront with the Grosse Point lighthouse",
+            "City skyline",
+            "Moon surface and a ringed planet",
+            "BJJ dojo with a belt rack",
+            "Mountains, aurora at night",
+            "Cozy room, rain or stars in the window",
+            "Cherry blossoms and a torii gate"
+          ],
+          "default": "forest",
+          "description": "Background behind the pets. Each has a day look for light editor themes and a night look for dark ones."
+        },
+        "petsPlus.effects": {
+          "type": "boolean",
+          "default": true,
+          "description": "Small moving touches in the background: stars, snow, petals, rain, clouds, the lighthouse beam."
+        },
+        "petsPlus.statusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show your most recent pet, its mood and level in the status bar."
+        },
+        "petsPlus.reactions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Pets react to saves, commits, tests, errors and idle time. XP still counts when this is off."
+        },
+        "petsPlus.idleMinutes": {
+          "type": "number",
+          "default": 10,
+          "minimum": 0,
+          "description": "Pets nap after this many minutes without activity. 0 turns napping off."
+        },
+        "petsPlus.focusMinutes": {
+          "type": "number",
+          "default": 25,
+          "minimum": 1,
+          "description": "Length of a focus block."
+        },
+        "petsPlus.breakMinutes": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "description": "Length of the break after a focus block."
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yahlawat/pets-plus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yahlawat/pets-plus/issues"
+  },
+  "homepage": "https://github.com/Yahlawat/pets-plus#readme",
+  "extensionKind": [
+    "ui"
+  ],
+  "scripts": {
+    "test": "node test/care.test.js && node --test test/assets.test.js test/import-pets.test.js",
+    "package": "node -e \"require('node:fs').mkdirSync('dist',{recursive:true})\" && vsce package --no-dependencies --out dist/",
+    "test:install": "node test/install.cjs"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "2.5.2",
+    "@vscode/vsce": "4.1.0"
+  },
+  "files": [
+    "src/**",
+    "media/**",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "overrides": {
+    "@vscode/vsce": {
+      "minimatch": "11.0.8"
+    }
+  }
+}
