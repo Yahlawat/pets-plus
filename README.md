@@ -10,6 +10,8 @@ An editor pet that reacts to saves, commits, tests, and errors. Feed it, level i
 2. Open **Extensions → … → Install from VSIX…** in VS Code or Cursor and select the file. The same download works on macOS and Windows.
 3. Open **Pets+** in Explorer. Click **+** or run **Pets+: Spawn Pet** to create your first pet.
 
+In Cursor, open the **Editor Window** before installing or using the extension.
+
 ### Bring over pets from VS Code Pets
 
 Run **Pets+: Import from VS Code Pets** to copy names, colors, and species from the default desktop VS Code profile. The command works from VS Code or Cursor and opens the source database read-only. Install the [SQLite CLI](https://sqlite.org/download.html) and put `sqlite3` on your PATH if it isn't already there. Restart the editor after changing PATH. You can disable the original extension after importing. Pet names, stats, and history live in your editor profile.
